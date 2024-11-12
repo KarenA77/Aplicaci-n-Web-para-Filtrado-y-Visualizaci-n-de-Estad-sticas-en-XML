@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<title>Información Estudiante</title>
+  </head>
+
+  <header class="header">
+    <nav><ul>
+      <li><a href="http://127.0.0.1:8000">Peticiones</a></li>
+      <li><a href="#">Ayuda</a>
+          <ul><li><a href="http://127.0.0.1:8000/estudiante">Información del Estudiante</a></li>
+          <li><a href="http://127.0.0.1:8000/documentacion">Documentación</a></li>
+      </li>
+  </ul></nav>
+  </header>
+  
+  <body>
+    <p> <label>Karen Michelle Gatica Arriola</label></p>
+    <p><label>201900603</label> </p>
+    <p><label>IPC2 Seccion: N</label></p>
+  </body>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-size:0;}  
+
+header{
+  background: rgba(0, 0, 0, 0.911);
+  color: #FFF;
+  padding: 2rem 0;
+
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+}
+
+nav a{
+      text-decoration:none;
+      color:inherit;
+      font-size:20px;
+      }
+            
+nav li{
+      display:inline-block;
+      width:273px;
+      height:57px;
+      padding:15px 10px;
+      background-color:rgba(0, 0, 0, 0.849);
+      border:1px solid #000;
+      text-align:center;
+      color:#fff;
+      position:relative;
+}
+            
+nav li:hover{
+      background-color:#fff;
+      color:#000;
+      }
+            
+nav li>ul{
+      display:none;
+      }
+
+nav li:hover>ul{
+      display:block;
+      position:absolute;
+      top:56px;
+      left:0px;
+}
+body
+{
+ width:100%;
+ margin:0 auto;
+ margin-top:300px;
+ background:#282828;
+ letter-spacing: normal;
+}
+
+body p label{
+    font: bold 25px Helvetica, Sans-Serif;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #eceef0;
+    margin-left: 500px;
+}    
+</style>  
+</html>

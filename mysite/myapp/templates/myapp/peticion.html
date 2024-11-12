@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request/Response</title>
+    <!-- <link rel="stylesheet" type="text/css" href="peticion.css"> -->
+  </head>
+
+  <header class="header">
+    <nav><ul>
+      <li><a href="http://127.0.0.1:8000">Peticiones</a></li>
+      <li><a href="#">Ayuda</a>
+          <ul><li><a href="http://127.0.0.1:8000/estudiante">Información del Estudiante</a></li>
+          <li><a href="http://127.0.0.1:8000/documentacion">Documentación</a></li>
+      </li>
+      
+  </ul></nav>
+  </header>
+  <body class="u"><li><input type="file" class="btnAzul" id="CargarArchivo" accept=".xml"> </li></body>
+
+
+  <body class="i">
+    <div class="contenedor">
+      <!-- 2 -->
+      <!-- Recibe los datos del XML original -->
+      <li>
+          <textarea id="archivoXML" readonly>ARCHIVO DE ENTRADA ORIGINAL</textarea>
+        <!-- Recibe los datos del XML modificado -->
+          <textarea id ="salidaXML"readonly>ARCHIVO DE SALIDA MODIFICADO</textarea>
+            
+      </li>
+    </div>
+    <div class="principal">
+      <!-- Boton Enviar o entrada -->
+      <label>Entrada</label>
+      <button type="button" onclick="enviarServidorXML()" id="btnEnviar" disabled>Enviar</button>
+      <!-- Boton Para recibir los datos de salida -->
+      <label>Salida</label>
+      <button type="button" onclick="reset()">Reset</button>
+      
+      <!-- onclick="enviarXML()" id="btnReset" disabled -->
+    </div>
+
+    <div class="otro">
+      <select class = "otro2"  id="tipoFiltrado">
+          <option>Aplicar Filtros </option>
+          <option value="reportado">Por Usuario</option>
+          <option value="error">Por Codigo</option>
+      </select>
+      <button type="button" id="btnFiltrar" onclick="filtrar()">Filtrar</button>
+    </div>  
+
+  </body>
+
+  <script>
+    function cargarArchivo(evento){
+      let archivo = evento.target.files[0];  //0 para que pueda seleccionar varios archivos
+      if(archivo){
+        let leer = new FileReader();
+        leer.onload = function(e){
+            let contenido = e.target.result;
+            document.getElementById('archivoXML').innerHTML=contenido;
+        };
+        leer.readAsText(archivo);
+
+        document.getElementById('btnEnviar').disabled=false;   //Enviando datos al boton enviar de la interfaz grafica
+      }else{
+         alert('Archivo incorrecto o Incompleto')  //Enviando un aviso en caso el archivo no pueda ser cargado
+      }
+    }
+
+    //Carga la pagina y llama a la funcion para cargar el archivo XML de entrada
+    window.addEventListener('load', () =>{
+          document.getElementById('CargarArchivo').addEventListener('change',cargarArchivo);
+    });
+
+    function enviarServidorXML(){
+        alert("Archivo en Proceso!");
+        datosXML = document.getElementById('archivoXML').value;    //Obtiene los datos del cuadro de texto 
+        console.log(datosXML);
+        var obj = {'datos': datosXML};
+        fetch('http://127.0.0.1:5000/recibirXML', {   // Servidor local de flask en el puerto 5000 para app.route(recibirXML)
+            method:'POST',                            // recibir informacion de flask para obtener app.route(inicio)
+            body: JSON.stringify(obj),
+            headers:{
+                  'Content-Type':'application/json'
+            }    
+        }).then(res => res.json()) 
+        .catch(error => {
+            alert('No se puede conectar con el servidor');
+        })
+        .then(response => {
+            alert('Datos enviados al servidor');
+            alert(response.mensaje)  
+        })
+    }
+
+    function reset(){
+      fetch('http://127.0.0.1:5000/reset')
+      .then(res => res.json())
+      .catch(error => {
+        alert('No se puede cargar, Servidor sin conexion');
+      })
+      .then(response => {
+        alert(response.mensaje)
+        location.href = "http://127.0.0.1:8000"
+      })
+    }
+
+    function filtrar(){
+      var filtrarPor = document.getElementById('tipoFiltrado').value;
+      var tipo = '';
+      if (filtrarPor=='reportado'){
+          tipo = 'usuario'
+      }else{
+          tipo = 'error'
+      }
+      var url = 'http://127.0.0.1:8000/filtrado' + tipo;
+      console.log(url)
+      fetch(url)
+      .then(res => res.json())
+      .catch(error => {
+          alert('No se puede conectar con el servidor');
+      })
+      .then(response => {
+          alert('Datos en Proceso!')
+          document.getElementById('salidaXML').innerHTML = response.respuesta;
+      }) 
+    }
+
+  </script>
+  <style>
+    /**{margin: 0;background-color: rgb(41, 39, 39);}*/
+    *{margin:0;padding:0;box-sizing:border-box;font-size:0;}  
+
+    header{
+    background: rgba(0, 0, 0, 0.911);
+    color: #FFF;
+    padding: 2rem 0;
+    
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+  }
+
+  nav a{
+    text-decoration:none;
+    color:inherit;
+    font-size:20px;
+    }
+
+  nav li{
+    display:inline-block;
+    width:273px;
+    height:57px;
+    padding:15px 10px;
+    background-color:rgba(0, 0, 0, 0.849);
+    border:1px solid #000;
+    text-align:center;
+    color:#fff;
+    position:relative;
+  }
+
+  nav li:hover{
+    background-color:#fff;
+    color:#000;
+  }
+
+  nav li>ul{
+    display:none;
+  }
+
+  nav li:hover>ul{
+    display:block;
+    position:absolute;
+    top:56px;
+    left:0px;
+  }
+
+  .u li input.btnAzul {
+    width:180px;
+    height:50px;
+    padding:15px 10px;
+    margin-top:60px;
+    margin-left: 1100px;
+    margin-right: auto;      
+
+    font: bold 25px Helvetica, Sans-Serif;
+    text-align: center;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: 200px ease-out;
+  }
+
+  .i{
+    text-align:left;
+    width:100%;
+    margin:0 auto;
+  }
+
+  .contenedor li textarea{
+    margin: 40px;
+    width: 100%;
+    max-width: 480px;
+    height: 460px;
+    list-style-type:none;
+    float:left;
+    margin-top: 30px;
+    margin-left: 100px;
+    text-align: center;
+    border-radius: 7px;
+    background-color: rgb(226, 225, 230);
+    font-size: 15px;
+  }
+
+  .principal label {
+    font-size: 25px;
+    color: rgb(5, 5, 5);
+    margin-top: -5px;
+    margin-left: 100px;
+    margin-right: 10px;
+    float:left;
+  }
+
+  .principal button[type='button']{
+    color: #fff;
+    width: 160px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: -5px;
+    margin-left: 245px;
+    margin-right: 20px;
+    border-radius: 4px;
+    float:left;
+    transition: 200px ease-out;
+    box-shadow: 0 0 10px #096464;
+    background: #096464;
+    background: linear-gradient(to right, #20738a, #1e9adb);
+  }
+  .principal button[type='button']:hover{
+    font-weight: 100px;
+    transform: scale(1.1);
+    box-shadow: 0 0 40px #1e9adb; 
+  }
+
+  .otro{
+    font-size: 15px;
+    width: 200px;
+    margin-left: 60px;
+  }
+
+  .otro .otro2{
+    display:block;
+    height:25px;
+    margin:10px auto;
+    min-width: 225px;
+    font-size: 15px;
+  }
+
+  .otro button[type='button']{
+    color: #fff;
+    width: 160px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    margin-left: 245px;
+    margin-right: 20px;
+    border-radius: 4px;
+    float:left;
+    transition: 200px ease-out;
+    box-shadow: 0 0 10px #096464;
+    background: #096464;
+    background: linear-gradient(to right, #20738a, #1e9adb);}
+
+</style>
+</html>
